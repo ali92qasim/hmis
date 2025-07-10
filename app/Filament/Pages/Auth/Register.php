@@ -2,12 +2,17 @@
 
 namespace App\Filament\Pages\Auth;
 
+use App\Models\Role;
 use App\Models\Tenant;
 use Filament\Pages\Auth\Register as BaseRegister;
 use Filament\Forms\Components\Component;
 use Filament\Forms;
 use Filament\Actions;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Notifications\Notification;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
+
 
 class Register extends BaseRegister
 {
@@ -63,17 +68,27 @@ class Register extends BaseRegister
 
             $data['tenant_id'] = $tenant->id;
 
+            $role = Role::firstOrCreate([
+                'name' => 'admin',
+                'tenant_id' => $tenant->id,
+                'guard_name' => 'web',
+            ]);
+            app(PermissionRegistrar::class)->setPermissionsTeamId($tenant->id);
+            $user = parent::handleRegistration($data);
+            $user->assignRole($role);
+            $role->syncPermissions(Permission::all());
+            return $user;
+
         } catch (\Throwable $e) {
             logger()->error('Tenant creation failed during registration', [
                 'error' => $e->getMessage(),
                 'data' => $data,
             ]);
-
-            $this->notify('danger', 'Something went wrong while setting up the hospital. Please try again.');
-
-            throw new $e;
+            Notification::make()
+                ->title('Something went wrong while setting up the hospital.')
+                ->danger()
+                ->send();
+            throw $e;
         }
-
-        return parent::handleRegistration($data);
     }
 }

@@ -10,8 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Model;
 
 class UserResource extends Resource
 {
@@ -27,14 +26,17 @@ class UserResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('roles')
-                    ->multiple()
-                    ->relationship('roles', 'name'),
-                Forms\Components\Hidden::make('tenant_id'),
+                    ->relationship(name: 'roles', titleAttribute: 'name')
+                    ->saveRelationshipsUsing(function (Model $record, $state) {
+                        $record->roles()->syncWithPivotValues($state, [config('permission.column_names.team_foreign_key') => session()->get('tenant_id')]);
+                    })
+                    ->dehydrated(false),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
+                Forms\Components\DateTimePicker::make('email_verified_at')
+                    ->native(false),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required()

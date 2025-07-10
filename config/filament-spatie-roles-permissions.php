@@ -141,7 +141,7 @@ return [
 
         'guard_names' => [
             'web',
-            'api',
+//            'api',
         ],
 
         'permission_affixes' => [
