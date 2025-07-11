@@ -16,4 +16,8 @@ class Visit extends Model
     {
         return $this->belongsTo(Department::class);
     }
+    public function doctor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'doctor_id');
+    }
 }

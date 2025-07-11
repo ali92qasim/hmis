@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PatientResource\Pages;
 use App\Filament\Resources\PatientResource\RelationManagers;
+use App\Filament\Resources\PatientResource\RelationManagers\VisitsRelationManager;
 use App\Models\Department;
 use App\Models\Patient;
 use Filament\Infolists\Components\Grid;
@@ -177,7 +178,9 @@ class PatientResource extends Resource
             ->actions([
                 ActionGroup::make([
                     Tables\Actions\Action::make('view-history')
-                        ->url(fn ($record) => route('filament.admin.resources.patients.view-history', ['record' => $record->getKey()]))
+                        ->label('Visit History')
+                        ->icon('heroicon-o-clock')
+                        ->url(fn ($record) => Pages\PatientVisitHistory::getUrl(['record' => $record->getKey()]))
                         ->icon('heroicon-o-clock'),
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\EditAction::make(),
@@ -203,7 +206,7 @@ class PatientResource extends Resource
         return [
             'index' => Pages\ListPatients::route('/'),
             'create' => Pages\CreatePatient::route('/create'),
-            'view-history' => Pages\ViewPatientHistory::route('/{record}/view-history'),
+            'visit-history' => Pages\PatientVisitHistory::route('/{record}/visit-history'),
             'edit' => Pages\EditPatient::route('/{record}/edit'),
         ];
     }

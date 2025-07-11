@@ -18,13 +18,10 @@ return new class extends Migration
                 ->constrained()
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
-            /*
-             * uncomment this when RBAC is added
-             */
-//            $table->foreignId('doctor_id')
-//                ->constrained('users')
-//                ->onDelete('cascade')
-//                ->onUpdate('cascade');
+            $table->foreignId('doctor_id')
+                ->constrained('users')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
             $table->foreignId('department_id')
                 ->constrained()
                 ->onDelete('cascade')
